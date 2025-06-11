@@ -1,6 +1,7 @@
 # This file tests the PoseFinderV5
 import DQClass
-import Randomizer
+import numpy as np
+# import Randomizer
 import RandomizerRedacted as rr
 import time
 
@@ -35,8 +36,8 @@ def TestV5(iters=1000):  # Lie Algebra fixed frame
     Legs = []
     Poses = []
     for n in range(iters):
-        Poses.append(Randomizer.MakeRandomPose())
-        Legs.append(Randomizer.LegLengths(Poses[n]))
+        Poses.append(rr.MakeRandomPose())
+        Legs.append(rr.LegLengthsRedacted(Poses[n]))
 
     Now = time.time()
     absDist = 0
@@ -52,8 +53,8 @@ def TestV6(iters=1000):  # Lie Algebra moving frame
     Legs = []
     Poses = []
     for n in range(iters):
-        Poses.append(Randomizer.MakeRandomPose())
-        Legs.append(Randomizer.LegLengths(Poses[n]))
+        Poses.append(rr.MakeRandomPose())
+        Legs.append(rr.LegLengthsRedacted(Poses[n]))
 
     Now = time.time()
     absDistV6 = 0
@@ -88,55 +89,106 @@ def TestV6_2(iters=1000):  # Lie Algebra moving frame redacted data
     print("V6_2 Average Error : ", absDist / iters)
 
 
-def TestV7(iters=1000):  # Lie Algebra and Modified Newton Raphson
-    import PoseFinderV7 as PF
+# def TestV7(iters=1000):  # Lie Algebra and Modified Newton Raphson
+#     import PoseFinderV7 as PF
+#
+#     Legs = []
+#     Poses = []
+#     for n in range(iters):
+#         Poses.append(rr.MakeRandomPose())
+#         Legs.append(rr.LegLengthsRedacted(Poses[n]))
+#
+#     computedPoses = []
+#     Now = time.time()
+#     for n in range(iters):
+#         F = PF.PoseFinder(Init, Legs[n])
+#         computedPoses.append(F)
+#     print("V7 Average Time: ", (time.time() - Now) / iters)
+#     absDist = 0
+#     for n in range(iters):
+#         absDist += (Poses[n] - computedPoses[n]).size()
+#     print("V7 Average Error : ", absDist / iters)
+#
+#
+# def TestV8_3(iters=1000):  # Garbage Gradient Descent. Not working.
+#     import PoseFinderV8_3 as PF
+#
+#     Legs = []
+#     Poses = []
+#     for n in range(iters):
+#         Poses.append(rr.MakeRandomPose())
+#         Legs.append(rr.LegLengthsRedacted(Poses[n]))
+#
+#     computedPoses = []
+#     Now = time.time()
+#     for n in range(iters):
+#         F = PF.PoseFinder(Init, Legs[n], rr.TableID, rr.Base)
+#         computedPoses.append(F)
+#     # print("V8 Average Time: ", (time.time() - Now) / iters)
+#     absDist = 0
+#     for n in range(iters):
+#         absDist += (Poses[n] - computedPoses[n]).size()
+#     # print("V8 Average Error : ", absDist / iters)
+#     print("Poses: ", Poses[0])
+#     print("Computed Poses: ", computedPoses[0])
 
+
+def test_Ren_Feng_Mills_2006(iters=1000):
+    import Ren_Feng_Mills_2006 as RFM
+
+    init = np.array([0, 0, 0, 0, 0, 0])
+    Table = np.array([rr.TableID[i].ToPureVec() for i in range(6)])
+    Base = np.array([rr.Base[i].ToPureVec() for i in range(6)])
     Legs = []
     Poses = []
     for n in range(iters):
-        Poses.append(Randomizer.MakeRandomPose())
-        Legs.append(Randomizer.LegLengths(Poses[n]))
+        Poses.append(rr.MakeEulerPose())
+        Legs.append(rr.euler_lengths(Poses[n], Table, Base))
 
+    RFM.PoseFinder(init, Legs[0], Table, Base)
     computedPoses = []
     Now = time.time()
     for n in range(iters):
-        F = PF.PoseFinder(Init, Legs[n])
+        # print("Iteration:", n)
+        F = RFM.PoseFinder(init, Legs[n], Table, Base)
         computedPoses.append(F)
-    print("V7 Average Time: ", (time.time() - Now) / iters)
+    print("RFM Average Time: ", (time.time() - Now) / iters)
     absDist = 0
     for n in range(iters):
-        absDist += (Poses[n] - computedPoses[n]).size()
-    print("V7 Average Error : ", absDist / iters)
+        absDist += np.linalg.norm(Poses[n] - computedPoses[n])
+    print("RFM Average Error : ", absDist / iters)
 
 
-def TestV8_3(iters=1000):  # Garbage Gradient Descent. Not working.
-    import PoseFinderV8_3 as PF
+def test_Selig_Li(iters=1000):
+    import Selig_Li as SL
 
+    init = np.array([0, 0, 0, 0, 0, 0])
+    Table = np.array([rr.TableID[i].ToPureVec() for i in range(6)])
+    Base = np.array([rr.Base[i].ToPureVec() for i in range(6)])
     Legs = []
     Poses = []
     for n in range(iters):
-        Poses.append(Randomizer.MakeRandomPose())
-        Legs.append(Randomizer.LegLengths(Poses[n]))
+        Poses.append(rr.MakeEulerPose())
+        Legs.append(rr.euler_lengths(Poses[n], Table, Base))
 
+    SL.PoseFinder(init, Legs[0], Table, Base)
     computedPoses = []
     Now = time.time()
     for n in range(iters):
-        F = PF.PoseFinder(Init, Legs[n], rr.TableID, rr.Base)
+        F = SL.PoseFinder(init, Legs[n], Table, Base)
         computedPoses.append(F)
-    # print("V8 Average Time: ", (time.time() - Now) / iters)
+    print("SL Average Time: ", (time.time() - Now) / iters)
     absDist = 0
     for n in range(iters):
-        absDist += (Poses[n] - computedPoses[n]).size()
-    # print("V8 Average Error : ", absDist / iters)
-    print("Poses: ", Poses[0])
-    print("Computed Poses: ", computedPoses[0])
+        absDist += np.linalg.norm(SL.rigid_body_matrix(Poses[n]) - computedPoses[n])
+    print("SL Average Error : ", absDist / iters)
 
 
 def TestAll():
     TestV1()
     TestV6()
     TestV6_2()
-    TestV7()
+    # TestV7()
 
 
 # TestV1()
@@ -146,4 +198,4 @@ def TestAll():
 # TestV7()
 # TestV8_3(1)
 
-TestAll()
+test_Selig_Li()
