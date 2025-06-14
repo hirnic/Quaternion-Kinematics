@@ -1,4 +1,4 @@
-# This file tests the PoseFinderV5
+# This file tests all the Pose Finders
 import DQClass
 import numpy as np
 # import Randomizer
@@ -21,14 +21,40 @@ def TestV1(iters=1000):  # Quaternion formulas
     computedPoses = []
     Now = time.time()
     for n in range(iters):
-        # print("Iteration:", n)
+        # print("Sample: ", n)
         F = PF.PoseFinder(Init, Legs[n], rr.TableID, rr.Base)
         computedPoses.append(F)
     print("V1 Average Time: ", (time.time() - Now) / iters)
     absDist = 0
     for n in range(iters):
-        absDist += (Poses[n] - computedPoses[n]).size()
-    print("V1 Average Error : ", absDist / iters)
+        absDist += computedPoses[n][1]
+    print("V1_2 Average Error : ", absDist / iters)
+
+
+def TestV1_2(iters=1000):
+    import PoseFinderV1_2 as PF2
+
+    Legs = []
+    Poses = []
+    for n in range(iters):
+        Poses.append(rr.MakeRandomPose())
+        Legs.append(rr.LegLengthsRedacted(Poses[n]))
+
+    data_loaded = np.load("data_50dag.npy")
+
+    PF2.PoseFinder(data_loaded, Legs[0], rr.TableID, rr.Base)
+    computedPoses = []
+    Now = time.time()
+    for n in range(iters):
+        # print("Sample: ", n)
+        F = PF2.PoseFinder(data_loaded, Legs[n], rr.TableID, rr.Base)
+        computedPoses.append(F)
+        # print(F)
+    print("V1_2 Average Time: ", (time.time() - Now) / iters)
+    absDist = 0
+    for n in range(iters):
+        absDist += computedPoses[n][1]
+    print("V1_2 Average Error : ", absDist / iters)
 
 
 def TestV5(iters=1000):  # Lie Algebra fixed frame
@@ -85,8 +111,8 @@ def TestV6_2(iters=1000):  # Lie Algebra moving frame redacted data
     print("V6_2 Average Time: ", (time.time() - Now) / iters)
     absDist = 0
     for n in range(iters):
-        absDist += (Poses[n] - computedPoses[n]).size()
-    print("V6_2 Average Error : ", absDist / iters)
+        absDist += computedPoses[n][1]
+    print("V1_2 Average Error : ", absDist / iters)
 
 
 # def TestV7(iters=1000):  # Lie Algebra and Modified Newton Raphson
@@ -133,7 +159,7 @@ def TestV6_2(iters=1000):  # Lie Algebra moving frame redacted data
 #     print("Computed Poses: ", computedPoses[0])
 
 
-def test_Ren_Feng_Mills_2006(iters=1000):
+def Test_Ren_Feng_Mills(iters=1000):
     import Ren_Feng_Mills_2006 as RFM
 
     init = np.array([0, 0, 0, 0, 0, 0])
@@ -159,7 +185,7 @@ def test_Ren_Feng_Mills_2006(iters=1000):
     print("RFM Average Error : ", absDist / iters)
 
 
-def test_Selig_Li(iters=1000):
+def Test_Selig_Li(iters = 1000):
     import Selig_Li as SL
 
     init = np.array([0, 0, 0, 0, 0, 0])
@@ -192,10 +218,11 @@ def TestAll():
 
 
 # TestV1()
+TestV1_2()
 # TestV5()
 # TestV6()
 # TestV6_2()
 # TestV7()
 # TestV8_3(1)
 
-test_Selig_Li()
+# test_Selig_Li()

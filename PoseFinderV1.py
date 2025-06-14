@@ -9,6 +9,7 @@ import numpy as np
 # coordinates, and outputs the pose dual quaternion of the table.
 def PoseFinder(init, lengths, TableID, Base):
     X, Y = init, DQClass.ZeroDQ()
+    hhh=0
     while (X - Y).size() > 1e-4:
         Y = X
         Q0 = X.A.w
@@ -62,9 +63,10 @@ def PoseFinder(init, lengths, TableID, Base):
         rotation = DQClass.ToQuaternionRotation(X[:3])
         translation = DQClass.Quaternion(0, X[3], X[4], X[5])
         X = DQClass.DQuaternion(rotation, translation)
+        hhh+=1
         # print(X)
     X.B = X.B * X.A * (0.5)
-    return X
+    return [X, hhh]
 
 
 # import RandomizerRedacted as rr

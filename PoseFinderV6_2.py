@@ -8,6 +8,7 @@ import DQClass
 # init is a dual quaternion pose, and lengths is an array of 6 floats. Output is a dual quaternion pose.
 def PoseFinder(init, lengths, TableID, Base):
     X, Y = init, DQClass.ZeroDQ()
+    hhh = 0
     while (X-Y).size() > 1e-4:
         Y = X
         f, Lf = [], []
@@ -21,4 +22,5 @@ def PoseFinder(init, lengths, TableID, Base):
         Theta = DQClass.ToVectorDualQuaternion(LInv.dot(np.array(f)))             # Equation (80), page 16
         Hat = (DQClass.IdentityDQ() + Theta).normalization()                      # Formula (79), page 16
         X = X * Hat                                                               # Formula (79), page 16
-    return X
+        hhh += 1
+    return [X, hhh]

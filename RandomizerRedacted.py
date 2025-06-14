@@ -42,7 +42,7 @@ Base = [B1, B2, B3, B4, B5, B6]
 
 def MakeRandomPose():
     # Here we generate a random rotation
-    theta = random.uniform(-1, 1)  # Rotation Angle between -30 and 30 degrees
+    theta = random.uniform(-.5, .5)  # Rotation Angle between -30 and 30 degrees
     i = random.uniform(-1, 1)
     j = random.uniform(-1, 1)
     k = random.uniform(-1, 1)
@@ -50,9 +50,9 @@ def MakeRandomPose():
          + DQClass.Quaternion(math.cos(1 / 2 * theta), 0, 0, 0))
     #[rr.Base[i].ToPureVec() for i in range(6)]
     # Here we generate a random translation
-    t1 = random.randrange(-600, 600)
-    t2 = random.randrange(-600, 600)
-    t3 = random.randrange(-600, 600)
+    t1 = random.randrange(-300, 300)
+    t2 = random.randrange(-300, 300)
+    t3 = random.randrange(-300, 300)
     t = DQClass.Quaternion(0, t1, t2, t3)
     #
     RandomPose = DQClass.DQuaternion(Q, t * Q * (1/2))

@@ -10,9 +10,10 @@ import DQClass
 import numpy as np
 import math
 import PoseFinderV1 as PF
+import PoseFinderV6_2 as PF6
 
 id_lengths = 1184.1607030279968  # Determined by table geometry
-diagonal_length = 100
+diagonal_length = 10  # Make sure this matches the file you are using
 edge_length = diagonal_length/np.sqrt(6)
 num_cubes = 11  # Should be odd for the next line to work properly
 min_length = id_lengths - num_cubes / 2 * diagonal_length
@@ -51,7 +52,7 @@ def offline_phase(TableID, Base):
 
     data = np.array(data, dtype=np.float32)
     print(data)
-    np.save("data_100dag.npy", data)
+    np.save("data_10dag.npy", data)
 
 
 def initial_guess(lengths):
@@ -80,25 +81,25 @@ def PoseFinder(data_loaded, lengths, TableID, Base):
     index = initial_guess(lengths)
     init = data_loaded[index]
     init = DQClass.ToDualQuaternion(init)
-    return PF.PoseFinder(init, lengths, TableID, Base)
+    return PF6.PoseFinder(init, lengths, TableID, Base)
 
 
-import RandomizerRedacted as rr
-identity_pose = DQClass.IdentityDQ()
-Table = rr.TableID
-Base = rr.Base
-
+# import RandomizerRedacted as rr
+# identity_pose = DQClass.IdentityDQ()
+# Table = rr.TableID
+# Base = rr.Base
+#
 # offline_phase(Table, Base)
 
-data_loaded = np.load("data_100dag.npy")
-for _ in range(100):
-    random_pose = rr.MakeRandomPose()
-    random_lengths = rr.LegLengthsRedacted(random_pose)
-    init = DQClass.ToDualQuaternion(data_loaded[initial_guess(random_lengths)])
-    computed_pose = PF.PoseFinder(DQClass.IdentityDQ(), random_lengths, Table, Base)
-    print("Random Pose: ", random_pose)
-    print("Initial Guess: ", init)
-    print("Computed Pose: ", computed_pose)
-    if np.linalg.norm(np.array((random_pose - computed_pose).ToFullVec())) > .5:
-        print("WRONG!")
-        break
+# data_loaded = np.load("data_100dag.npy")
+# for _ in range(100):
+#     random_pose = rr.MakeRandomPose()
+#     random_lengths = rr.LegLengthsRedacted(random_pose)
+#     init = DQClass.ToDualQuaternion(data_loaded[initial_guess(random_lengths)])
+#     computed_pose = PF.PoseFinder(DQClass.IdentityDQ(), random_lengths, Table, Base)
+#     print("Random Pose: ", random_pose)
+#     print("Initial Guess: ", init)
+#     print("Computed Pose: ", computed_pose)
+#     if np.linalg.norm(np.array((random_pose - computed_pose).ToFullVec())) > .5:
+#         print("WRONG!")
+#         break
